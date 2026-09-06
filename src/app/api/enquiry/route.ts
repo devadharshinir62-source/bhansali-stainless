@@ -68,20 +68,56 @@ export async function POST(request: NextRequest) {
     console.log(`Specs/Notes  : ${data.additionalSpecifications || 'None'}`);
     console.log('======================================================\n');
 
-    /*
-    // OPTIONAL CRM WEBHOOK DISPATCH (Plug in your real endpoint here):
-    if (process.env.CRM_WEBHOOK_URL) {
-      try {
-        await fetch(process.env.CRM_WEBHOOK_URL, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ enquiryId, submittedAt, ...data }),
-        });
-      } catch (crmErr) {
-        console.error('CRM forwarding warning:', crmErr);
-      }
+    // 3. Dispatch to CRM / Google Sheets Webhook
+    const crmWebhookUrl = process.env.CRM_WEBHOOK_URL;
+    if (!crmWebhookUrl) {
+      console.error('[Bhansali RFQ] CRM_WEBHOOK_URL environment variable is not configured.');
+      return NextResponse.json<EnquirySubmissionResponse>(
+        {
+          success: false,
+          message: 'CRM integration is not configured. Quotation request could not be stored.',
+        },
+        { status: 503 }
+      );
     }
-    */
+
+    const webhookPayload = {
+      enquiryId,
+      submittedAt,
+      ...data,
+    };
+
+    let webhookResponse: Response;
+    try {
+      webhookResponse = await fetch(crmWebhookUrl, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+        },
+        body: JSON.stringify(webhookPayload),
+      });
+    } catch (networkError) {
+      console.error('[Bhansali RFQ] Network error dispatching to CRM webhook:', networkError);
+      return NextResponse.json<EnquirySubmissionResponse>(
+        {
+          success: false,
+          message: 'Failed to communicate with CRM webhook endpoint. Quotation request could not be stored.',
+        },
+        { status: 502 }
+      );
+    }
+
+    if (!webhookResponse.ok) {
+      console.error(`[Bhansali RFQ] CRM webhook returned failure status: ${webhookResponse.status} ${webhookResponse.statusText}`);
+      return NextResponse.json<EnquirySubmissionResponse>(
+        {
+          success: false,
+          message: `CRM webhook rejected the quotation request (status ${webhookResponse.status}). Request was not stored.`,
+        },
+        { status: 502 }
+      );
+    }
 
     return NextResponse.json<EnquirySubmissionResponse>({
       success: true,
