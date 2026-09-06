@@ -19,7 +19,42 @@ import { EnquiryFormData, EnquirySubmissionResponse } from '@/lib/types';
 
 export async function POST(request: NextRequest) {
   try {
-    const data: EnquiryFormData = await request.json();
+    const rawData = await request.json();
+
+    // Normalize and ensure exact required property names:
+    // fullName, businessEmail, phone, company, destination, grade, flangeType, pressureRating, quantity, notes
+    const fullName = typeof rawData.fullName === 'string' ? rawData.fullName.trim() : '';
+    const businessEmail = typeof rawData.businessEmail === 'string' ? rawData.businessEmail.trim() : '';
+    const phone = typeof rawData.phone === 'string' ? rawData.phone.trim() : '';
+    const company = typeof (rawData.company ?? rawData.companyName) === 'string' ? (rawData.company ?? rawData.companyName).trim() : '';
+    const destination = typeof (rawData.destination ?? rawData.destinationCountry) === 'string' ? (rawData.destination ?? rawData.destinationCountry).trim() : '';
+    const grade = typeof (rawData.grade ?? rawData.productGrade) === 'string' ? (rawData.grade ?? rawData.productGrade).trim() : '';
+    const flangeType = typeof rawData.flangeType === 'string' ? rawData.flangeType.trim() : '';
+    const pressureRating = typeof (rawData.pressureRating ?? rawData.pressureClass) === 'string' ? (rawData.pressureRating ?? rawData.pressureClass).trim() : '';
+    const quantity = typeof (rawData.quantity ?? rawData.estimatedQuantity) === 'string' ? (rawData.quantity ?? rawData.estimatedQuantity).trim() : '';
+    const notes = typeof (rawData.notes ?? rawData.additionalSpecifications) === 'string' ? (rawData.notes ?? rawData.additionalSpecifications).trim() : '';
+
+    const data: EnquiryFormData = {
+      fullName,
+      businessEmail,
+      phone,
+      company,
+      destination,
+      grade,
+      flangeType,
+      pressureRating,
+      quantity,
+      notes,
+      // Backward compatibility aliases
+      companyName: company,
+      destinationCountry: destination,
+      productGrade: grade,
+      pressureClass: pressureRating,
+      estimatedQuantity: quantity,
+      additionalSpecifications: notes,
+      sizeRange: rawData.sizeRange,
+      projectTimeline: rawData.projectTimeline,
+    };
 
     // 1. Server-side validation check
     if (!data.fullName || !data.businessEmail || !data.phone) {
@@ -58,14 +93,14 @@ export async function POST(request: NextRequest) {
     console.log(`Full Name    : ${data.fullName}`);
     console.log(`Email        : ${data.businessEmail}`);
     console.log(`Phone        : ${data.phone}`);
-    console.log(`Company      : ${data.companyName || 'Not specified'}`);
-    console.log(`Destination  : ${data.destinationCountry || 'Middle East / GCC'}`);
-    console.log(`Grade        : ${data.productGrade || 'Stainless Steel 316L'}`);
+    console.log(`Company      : ${data.company || 'Not specified'}`);
+    console.log(`Destination  : ${data.destination || 'Middle East / GCC'}`);
+    console.log(`Grade        : ${data.grade || 'Stainless Steel 316L'}`);
     console.log(`Flange Type  : ${data.flangeType || 'Weld Neck Flange'}`);
-    console.log(`Pressure/Size: ${data.pressureClass || 'Class 150'} | ${data.sizeRange || 'NPS 2'}`);
-    console.log(`Quantity     : ${data.estimatedQuantity || 'Not specified'}`);
+    console.log(`Pressure/Size: ${data.pressureRating || 'Class 150'} | ${data.sizeRange || ''}`);
+    console.log(`Quantity     : ${data.quantity || 'Not specified'}`);
     console.log(`Timeline     : ${data.projectTimeline || 'Standard project schedule'}`);
-    console.log(`Specs/Notes  : ${data.additionalSpecifications || 'None'}`);
+    console.log(`Specs/Notes  : ${data.notes || 'None'}`);
     console.log('======================================================\n');
 
     // 3. Dispatch to CRM / Google Sheets Webhook
@@ -84,7 +119,23 @@ export async function POST(request: NextRequest) {
     const webhookPayload = {
       enquiryId,
       submittedAt,
-      ...data,
+      fullName: data.fullName,
+      businessEmail: data.businessEmail,
+      phone: data.phone,
+      company: data.company,
+      destination: data.destination,
+      grade: data.grade,
+      flangeType: data.flangeType,
+      pressureRating: data.pressureRating,
+      quantity: data.quantity,
+      notes: data.notes,
+      // Backward compatibility aliases
+      companyName: data.company,
+      destinationCountry: data.destination,
+      productGrade: data.grade,
+      pressureClass: data.pressureRating,
+      estimatedQuantity: data.quantity,
+      additionalSpecifications: data.notes,
     };
 
     let webhookResponse: Response;

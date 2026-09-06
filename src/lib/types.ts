@@ -60,15 +60,22 @@ export interface EnquiryFormData {
   fullName: string;
   businessEmail: string;
   phone: string;
-  companyName: string;
-  destinationCountry: string;
-  productGrade: string;
+  company: string;
+  destination: string;
+  grade: string;
   flangeType: string;
-  pressureClass: string;
-  sizeRange: string;
-  estimatedQuantity: string;
-  projectTimeline: string;
-  additionalSpecifications: string;
+  pressureRating: string;
+  quantity: string;
+  notes: string;
+  // Optional aliases for backward compatibility
+  companyName?: string;
+  destinationCountry?: string;
+  productGrade?: string;
+  pressureClass?: string;
+  sizeRange?: string;
+  estimatedQuantity?: string;
+  projectTimeline?: string;
+  additionalSpecifications?: string;
 }
 
 export interface EnquirySubmissionResponse {

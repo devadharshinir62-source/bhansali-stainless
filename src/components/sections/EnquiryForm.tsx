@@ -11,15 +11,13 @@ export const EnquiryForm: React.FC = () => {
     fullName: '',
     businessEmail: '',
     phone: '',
-    companyName: '',
-    destinationCountry: 'Saudi Arabia',
-    productGrade: 'Stainless Steel 316L',
+    company: '',
+    destination: 'Saudi Arabia',
+    grade: 'Stainless Steel 316L',
     flangeType: 'Weld Neck Flange (WNRF)',
-    pressureClass: 'Class 300',
-    sizeRange: 'NPS 2 to NPS 8',
-    estimatedQuantity: '',
-    projectTimeline: 'Within 30 Days',
-    additionalSpecifications: '',
+    pressureRating: 'Class 300',
+    quantity: '',
+    notes: '',
   };
 
   const [formData, setFormData] = useState<EnquiryFormData>(initialFormState);
@@ -34,7 +32,7 @@ export const EnquiryForm: React.FC = () => {
       if (customEvent.detail) {
         setFormData((prev) => ({
           ...prev,
-          productGrade: customEvent.detail,
+          grade: customEvent.detail,
         }));
       }
     };
@@ -121,10 +119,10 @@ export const EnquiryForm: React.FC = () => {
         // 3. Trigger Analytics / GA4 mock event
         trackEnquirySubmit({
           enquiryId: result.enquiryId || 'BS-RFQ-LOCAL',
-          destinationCountry: formData.destinationCountry,
-          productGrade: formData.productGrade,
+          destinationCountry: formData.destination,
+          productGrade: formData.grade,
           flangeType: formData.flangeType,
-          quantity: formData.estimatedQuantity || 'Not Specified',
+          quantity: formData.quantity || 'Not Specified',
         });
       } else {
         setErrors((prev) => ({
@@ -255,7 +253,7 @@ export const EnquiryForm: React.FC = () => {
                   </div>
                   <div className="flex justify-between border-b border-slate-800 pb-2">
                     <span className="text-slate-400">Product Grade:</span>
-                    <span className="text-slate-200">{formData.productGrade}</span>
+                    <span className="text-slate-200">{formData.grade}</span>
                   </div>
                   <div className="flex justify-between border-b border-slate-800 pb-2">
                     <span className="text-slate-400">Flange Type:</span>
@@ -263,7 +261,7 @@ export const EnquiryForm: React.FC = () => {
                   </div>
                   <div className="flex justify-between">
                     <span className="text-slate-400">Destination:</span>
-                    <span className="text-slate-200">{formData.destinationCountry}</span>
+                    <span className="text-slate-200">{formData.destination}</span>
                   </div>
                 </div>
 
@@ -391,16 +389,16 @@ export const EnquiryForm: React.FC = () => {
 
                   <div>
                     <label
-                      htmlFor="companyName"
+                      htmlFor="company"
                       className="block text-xs font-mono uppercase tracking-wider text-slate-300 mb-1.5"
                     >
                       Company / Organization
                     </label>
                     <input
                       type="text"
-                      id="companyName"
-                      name="companyName"
-                      value={formData.companyName}
+                      id="company"
+                      name="company"
+                      value={formData.company}
                       onChange={handleChange}
                       placeholder="e.g. Petrofac / Saudi Aramco Contractor"
                       className="w-full bg-slate-900 border border-slate-700 text-xs sm:text-sm text-slate-100 p-2.5 rounded-sm focus:outline-none focus:border-sky-500 focus:ring-1 focus:ring-sky-500"
@@ -412,15 +410,15 @@ export const EnquiryForm: React.FC = () => {
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
                     <label
-                      htmlFor="destinationCountry"
+                      htmlFor="destination"
                       className="block text-xs font-mono uppercase tracking-wider text-slate-300 mb-1.5"
                     >
                       Destination Market / Port
                     </label>
                     <select
-                      id="destinationCountry"
-                      name="destinationCountry"
-                      value={formData.destinationCountry}
+                      id="destination"
+                      name="destination"
+                      value={formData.destination}
                       onChange={handleChange}
                       className="w-full bg-slate-900 border border-slate-700 text-xs sm:text-sm text-slate-100 p-2.5 rounded-sm focus:outline-none focus:border-sky-500 focus:ring-1 focus:ring-sky-500"
                     >
@@ -437,15 +435,15 @@ export const EnquiryForm: React.FC = () => {
 
                   <div>
                     <label
-                      htmlFor="productGrade"
+                      htmlFor="grade"
                       className="block text-xs font-mono uppercase tracking-wider text-slate-300 mb-1.5"
                     >
                       Stainless Steel Grade Interest
                     </label>
                     <select
-                      id="productGrade"
-                      name="productGrade"
-                      value={formData.productGrade}
+                      id="grade"
+                      name="grade"
+                      value={formData.grade}
                       onChange={handleChange}
                       className="w-full bg-slate-900 border border-slate-700 text-xs sm:text-sm text-slate-100 p-2.5 rounded-sm focus:outline-none focus:border-sky-500 focus:ring-1 focus:ring-sky-500"
                     >
@@ -488,15 +486,15 @@ export const EnquiryForm: React.FC = () => {
 
                   <div>
                     <label
-                      htmlFor="pressureClass"
+                      htmlFor="pressureRating"
                       className="block text-xs font-mono uppercase tracking-wider text-slate-300 mb-1.5"
                     >
                       Pressure Rating
                     </label>
                     <select
-                      id="pressureClass"
-                      name="pressureClass"
-                      value={formData.pressureClass}
+                      id="pressureRating"
+                      name="pressureRating"
+                      value={formData.pressureRating}
                       onChange={handleChange}
                       className="w-full bg-slate-900 border border-slate-700 text-xs sm:text-sm text-slate-100 p-2.5 rounded-sm focus:outline-none focus:border-sky-500"
                     >
@@ -512,16 +510,16 @@ export const EnquiryForm: React.FC = () => {
 
                   <div>
                     <label
-                      htmlFor="estimatedQuantity"
+                      htmlFor="quantity"
                       className="block text-xs font-mono uppercase tracking-wider text-slate-300 mb-1.5"
                     >
                       Estimated Quantity
                     </label>
                     <input
                       type="text"
-                      id="estimatedQuantity"
-                      name="estimatedQuantity"
-                      value={formData.estimatedQuantity}
+                      id="quantity"
+                      name="quantity"
+                      value={formData.quantity}
                       onChange={handleChange}
                       placeholder="e.g. 250 pcs / 1 FCL"
                       className="w-full bg-slate-900 border border-slate-700 text-xs sm:text-sm text-slate-100 p-2.5 rounded-sm focus:outline-none focus:border-sky-500"
@@ -532,16 +530,16 @@ export const EnquiryForm: React.FC = () => {
                 {/* Additional Specifications */}
                 <div>
                   <label
-                    htmlFor="additionalSpecifications"
+                    htmlFor="notes"
                     className="block text-xs font-mono uppercase tracking-wider text-slate-300 mb-1.5"
                   >
                     Additional Specifications & Project Notes
                   </label>
                   <textarea
-                    id="additionalSpecifications"
-                    name="additionalSpecifications"
+                    id="notes"
+                    name="notes"
                     rows={3}
-                    value={formData.additionalSpecifications}
+                    value={formData.notes}
                     onChange={handleChange}
                     placeholder="Include size range (e.g., NPS 2 to NPS 12), pipe schedule (SCH 40/80), facing (RF/RTJ), inspection requirements, or target delivery dates..."
                     className="w-full bg-slate-900 border border-slate-700 text-xs sm:text-sm text-slate-100 p-2.5 rounded-sm focus:outline-none focus:border-sky-500 focus:ring-1 focus:ring-sky-500"
