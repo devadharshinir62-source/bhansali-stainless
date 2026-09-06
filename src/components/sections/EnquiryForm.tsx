@@ -155,6 +155,25 @@ export const EnquiryForm: React.FC = () => {
     setSubmissionResult(null);
   };
 
+  // Dynamic contact URL for RFQ success state: resolves to current production origin or Vercel production URL
+  const contactHref =
+    typeof window !== 'undefined' && window.location.origin && !window.location.origin.includes('localhost')
+      ? `${window.location.origin}/#contact`
+      : 'https://bhansali-stainless.vercel.app/#contact';
+
+  const handleContactClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
+    // Keep local development smooth by scrolling smoothly to #contact
+    if (typeof window !== 'undefined' && window.location.origin.includes('localhost')) {
+      e.preventDefault();
+      const contactEl = document.getElementById('contact');
+      if (contactEl) {
+        contactEl.scrollIntoView({ behavior: 'smooth' });
+      } else {
+        window.location.hash = 'contact';
+      }
+    }
+  };
+
   return (
     <section id="enquiry" className="py-20 bg-slate-900/80 border-b border-slate-800 scroll-mt-16">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -257,7 +276,8 @@ export const EnquiryForm: React.FC = () => {
                     Submit Another RFQ
                   </button>
                   <a
-                    href="#contact"
+                    href={contactHref}
+                    onClick={handleContactClick}
                     className="w-full sm:w-auto px-6 py-2.5 text-xs font-medium text-slate-300 bg-slate-900 hover:bg-slate-800 border border-slate-800 rounded-sm transition-colors"
                   >
                     View Direct Phone Lines
